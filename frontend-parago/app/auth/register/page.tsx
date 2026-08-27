@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
+<<<<<<< Updated upstream
 import { Mail, Lock, Eye, EyeOff, ArrowRight, LogIn, Phone, CheckCircle2, Check, X } from "lucide-react";
+=======
+import { Mail, Lock, Eye, EyeOff, ArrowRight, LogIn, Phone, CheckCircle2, Check } from "lucide-react";
+>>>>>>> Stashed changes
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -70,7 +74,10 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     setServerError("");
+<<<<<<< Updated upstream
     // Bypass registration check (sementara tanpa database)
+=======
+>>>>>>> Stashed changes
     localStorage.setItem("token", "bypass-mock-session-token");
     localStorage.setItem("user_email", data.email);
     router.push("/dashboard");
@@ -80,8 +87,11 @@ export default function RegisterPage() {
   return (
     <main className="min-h-screen w-full flex items-center justify-center bg-[#f5f6f8] p-4 md:p-8">
       <div className="w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-panel md:grid md:grid-cols-2">
+<<<<<<< Updated upstream
 
         
+=======
+>>>>>>> Stashed changes
         {/* ---------------- LEFT PANEL ---------------- */}
         <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-[#0A0E27] via-[#0A0E27] to-[#241305] p-10 md:flex lg:p-14">
           <div
@@ -406,4 +416,8 @@ export default function RegisterPage() {
       </div>
     </main>
   );
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes
