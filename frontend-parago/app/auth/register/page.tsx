@@ -70,21 +70,11 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     setServerError("");
-    try {
-      await api.post("/auth/register", {
-        email: data.email,
-        phone_number: data.phoneNumber,
-        password: data.password,
-      });
-      router.push("/auth/login?registered=true");
-    } catch (err: any) {
-      const msg =
-        err?.response?.data?.error ||
-        "Gagal mendaftar akun. Silakan coba lagi nanti.";
-      setServerError(msg);
-    } finally {
-      setIsLoading(false);
-    }
+    // Bypass registration check (sementara tanpa database)
+    localStorage.setItem("token", "bypass-mock-session-token");
+    localStorage.setItem("user_email", data.email);
+    router.push("/dashboard");
+    setIsLoading(false);
   };
 
   return (
