@@ -1,0 +1,27 @@
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+@theme {
+  --color-parago-blue: #2F5FE0;
+  --color-parago-navy: #0A0E27;
+  --color-parago-navyDeep: #050714;
+  --color-parago-gold: #D9B98A;
+  --color-parago-peach: #F3C994;
+  --color-parago-peachDark: #EDBB7C;
+  --font-sans: var(--font-poppins), "Poppins", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --tracking-widest2: 0.2em;
+  --shadow-panel: 0 30px 80px -20px rgba(10, 14, 39, 0.35);
+}
+
+html,
+body {
+    padding: 0;
+    margin: 0;
+    background-color: #f5f6f8;
+    font-family: var(--font-poppins), "Poppins", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+* {
+    box-sizing: border-box;
+}

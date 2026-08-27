@@ -1,29 +1,33 @@
 package main
 
 import (
-	"github.com/gin-contrib/cors"
+	"log"
+
+	"parago-backend/internal/config"
+	"parago-backend/internal/routes"
+	"parago-backend/internal/ws"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	// Load konfigurasi & koneksi database
+	config.LoadEnv()
+	db := config.ConnectDB()
+
+	// Inisialisasi WebSocket Hub & jalankan goroutine
+	hub := ws.NewHub()
+	go hub.Run()
+
+	// Inisialisasi Gin router
 	r := gin.Default()
 
-	// Setup CORS untuk mengizinkan request dari Next.js
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		AllowCredentials: true,
-	}))
+	// Daftarkan semua route
+	routes.SetupRoutes(r, db, hub)
 
-	// Contoh Grouping API
-	api := r.Group("/api/v1")
-	{
-		api.GET("/vehicles", func(c *gin.Context) {
-			c.JSON(200, gin.H{"message": "List of vehicles"})
-		})
+	port := config.GetEnv("PORT", "8080")
+	log.Printf("Server berjalan di port %s", port)
+	if err := r.Run(":" + port); err != nil {
+		log.Fatalf("Gagal menjalankan server: %v", err)
 	}
-
-	// Jalankan server di port 8080
-	r.Run(":8080")
 }
