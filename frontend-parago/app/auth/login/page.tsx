@@ -43,23 +43,11 @@ function LoginFormContent() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     setServerError("");
-    try {
-      const response = await api.post("/auth/login", {
-        email: data.email,
-        password: data.password,
-      });
-      if (response.data?.token) {
-        localStorage.setItem("token", response.data.token);
-      }
-      router.push("/dashboard/tracking");
-    } catch (err: any) {
-      const msg =
-        err?.response?.data?.error ||
-        "Email atau password salah. Silakan periksa kembali data Anda.";
-      setServerError(msg);
-    } finally {
-      setIsLoading(false);
-    }
+    // Bypass authentication check (sementara tanpa database)
+    localStorage.setItem("token", "bypass-mock-session-token");
+    localStorage.setItem("user_email", data.email);
+    router.push("/dashboard");
+    setIsLoading(false);
   };
 
   return (
