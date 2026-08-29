@@ -406,8 +406,4 @@ export default function RegisterPage() {
       </div>
     </main>
   );
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes
