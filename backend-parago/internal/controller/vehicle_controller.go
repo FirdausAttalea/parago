@@ -3,13 +3,13 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"parago-backend/internal/models"
 	"parago-backend/internal/repository"
 	"parago-backend/internal/ws"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type VehicleController struct {
@@ -31,13 +31,13 @@ func (c *VehicleController) GetAll(ctx *gin.Context) {
 }
 
 func (c *VehicleController) GetByID(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	id, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
 		return
 	}
 
-	vehicle, err := c.Repo.FindByID(uint(id))
+	vehicle, err := c.Repo.FindByID(id)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": "Kendaraan tidak ditemukan"})
 		return
@@ -60,7 +60,11 @@ func (c *VehicleController) Create(ctx *gin.Context) {
 }
 
 func (c *VehicleController) UpdateLocation(ctx *gin.Context) {
-	id, _ := strconv.Atoi(ctx.Param("id"))
+	id, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		return
+	}
 
 	var payload struct {
 		Latitude  float64 `json:"latitude"`
@@ -71,7 +75,7 @@ func (c *VehicleController) UpdateLocation(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.Repo.UpdateLocation(uint(id), payload.Latitude, payload.Longitude); err != nil {
+	if err := c.Repo.UpdateLocation(id, payload.Latitude, payload.Longitude); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal update lokasi"})
 		return
 	}
