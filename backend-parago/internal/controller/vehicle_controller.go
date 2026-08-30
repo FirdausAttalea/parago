@@ -2,14 +2,15 @@ package controller
 
 import (
 	"encoding/json"
-	"net/http"
 	"strconv"
 
 	"parago-backend/internal/models"
 	"parago-backend/internal/repository"
+	"parago-backend/internal/response"
 	"parago-backend/internal/ws"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type VehicleController struct {
@@ -24,55 +25,59 @@ func NewVehicleController(repo *repository.VehicleRepository, hub *ws.Hub) *Vehi
 func (c *VehicleController) GetAll(ctx *gin.Context) {
 	vehicles, err := c.Repo.FindAll()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data kendaraan"})
+		response.InternalError(ctx, "Gagal mengambil data kendaraan")
 		return
 	}
-	ctx.JSON(http.StatusOK, vehicles)
+	response.OK(ctx, vehicles)
 }
 
 func (c *VehicleController) GetByID(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	id, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		response.BadRequest(ctx, "ID tidak valid")
 		return
 	}
 
-	vehicle, err := c.Repo.FindByID(uint(id))
+	vehicle, err := c.Repo.FindByID(id)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": "Kendaraan tidak ditemukan"})
+		response.NotFound(ctx, "Kendaraan tidak ditemukan")
 		return
 	}
-	ctx.JSON(http.StatusOK, vehicle)
+	response.OK(ctx, vehicle)
 }
 
 func (c *VehicleController) Create(ctx *gin.Context) {
 	var vehicle models.Vehicle
 	if err := ctx.ShouldBindJSON(&vehicle); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(ctx, err.Error())
 		return
 	}
 
 	if err := c.Repo.Create(&vehicle); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menambah kendaraan"})
+		response.InternalError(ctx, "Gagal menambah kendaraan")
 		return
 	}
-	ctx.JSON(http.StatusCreated, vehicle)
+	response.Created(ctx, vehicle)
 }
 
 func (c *VehicleController) UpdateLocation(ctx *gin.Context) {
-	id, _ := strconv.Atoi(ctx.Param("id"))
+	id, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		return
+	}
 
 	var payload struct {
 		Latitude  float64 `json:"latitude"`
 		Longitude float64 `json:"longitude"`
 	}
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.BadRequest(ctx, err.Error())
 		return
 	}
 
 	if err := c.Repo.UpdateLocation(uint(id), payload.Latitude, payload.Longitude); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal update lokasi"})
+		response.InternalError(ctx, "Gagal update lokasi")
 		return
 	}
 
@@ -85,5 +90,5 @@ func (c *VehicleController) UpdateLocation(ctx *gin.Context) {
 	})
 	c.Hub.Broadcast(message)
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Lokasi berhasil diperbarui"})
+	response.OK(ctx, gin.H{"message": "Lokasi berhasil diperbarui"})
 }

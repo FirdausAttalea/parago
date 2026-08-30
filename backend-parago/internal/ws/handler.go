@@ -7,15 +7,28 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true // Sesuaikan dengan origin frontend di production
-	},
-}
+// ServeWs mengembalikan handler upgrade WebSocket. allowedOrigins dipakai
+// buat validasi header Origin, memakai whitelist yang sama dengan CORS HTTP
+// (lihat internal/config.GetAllowedOrigins & internal/middleware.CORS).
+func ServeWs(hub *Hub, allowedOrigins []string) gin.HandlerFunc {
+	upgrader := websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			origin := r.Header.Get("Origin")
+			if origin == "" {
+				// Non-browser client (mis. tool internal) tidak kirim header Origin.
+				return true
+			}
+			for _, allowed := range allowedOrigins {
+				if allowed == origin {
+					return true
+				}
+			}
+			return false
+		},
+	}
 
-func ServeWs(hub *Hub) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 		if err != nil {
