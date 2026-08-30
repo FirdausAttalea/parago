@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupRoutes(r *gin.Engine, db *gorm.DB, hub *ws.Hub) {
+func SetupRoutes(r *gin.Engine, db *gorm.DB, hub *ws.Hub, allowedOrigins []string) {
 	vehicleRepo := repository.NewVehicleRepository(db)
 	vehicleController := controller.NewVehicleController(vehicleRepo, hub)
 
@@ -23,6 +23,6 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB, hub *ws.Hub) {
 			vehicles.PATCH("/:id/location", vehicleController.UpdateLocation)
 		}
 
-		api.GET("/ws", ws.ServeWs(hub))
+		api.GET("/ws", ws.ServeWs(hub, allowedOrigins))
 	}
 }

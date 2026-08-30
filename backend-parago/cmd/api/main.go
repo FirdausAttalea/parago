@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"parago-backend/internal/config"
+	"parago-backend/internal/middleware"
 	"parago-backend/internal/routes"
 	"parago-backend/internal/ws"
 
@@ -14,6 +15,7 @@ func main() {
 	// Load konfigurasi & koneksi database
 	config.LoadEnv()
 	db := config.ConnectDB()
+	allowedOrigins := config.GetAllowedOrigins()
 
 	// Migrasi skema database sesuai ERD
 	if err := config.Migrate(db); err != nil {
@@ -26,9 +28,10 @@ func main() {
 
 	// Inisialisasi Gin router
 	r := gin.Default()
+	r.Use(middleware.CORS(allowedOrigins))
 
 	// Daftarkan semua route
-	routes.SetupRoutes(r, db, hub)
+	routes.SetupRoutes(r, db, hub, allowedOrigins)
 
 	port := config.GetEnv("PORT", "8080")
 	log.Printf("Server berjalan di port %s", port)
