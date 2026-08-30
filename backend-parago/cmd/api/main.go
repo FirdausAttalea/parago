@@ -17,6 +17,11 @@ func main() {
 	db := config.ConnectDB()
 	allowedOrigins := config.GetAllowedOrigins()
 
+	// Migrasi skema database sesuai ERD
+	if err := config.Migrate(db); err != nil {
+		log.Fatalf("Gagal migrasi database: %v", err)
+	}
+
 	// Inisialisasi WebSocket Hub & jalankan goroutine
 	hub := ws.NewHub()
 	go hub.Run()
