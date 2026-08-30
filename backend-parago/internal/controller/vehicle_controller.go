@@ -10,6 +10,7 @@ import (
 	"parago-backend/internal/ws"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type VehicleController struct {
@@ -31,13 +32,13 @@ func (c *VehicleController) GetAll(ctx *gin.Context) {
 }
 
 func (c *VehicleController) GetByID(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+	id, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
 		response.BadRequest(ctx, "ID tidak valid")
 		return
 	}
 
-	vehicle, err := c.Repo.FindByID(uint(id))
+	vehicle, err := c.Repo.FindByID(id)
 	if err != nil {
 		response.NotFound(ctx, "Kendaraan tidak ditemukan")
 		return
@@ -60,7 +61,11 @@ func (c *VehicleController) Create(ctx *gin.Context) {
 }
 
 func (c *VehicleController) UpdateLocation(ctx *gin.Context) {
-	id, _ := strconv.Atoi(ctx.Param("id"))
+	id, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		return
+	}
 
 	var payload struct {
 		Latitude  float64 `json:"latitude"`
