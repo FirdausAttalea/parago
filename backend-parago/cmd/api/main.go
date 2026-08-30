@@ -15,6 +15,11 @@ func main() {
 	config.LoadEnv()
 	db := config.ConnectDB()
 
+	// Migrasi skema database sesuai ERD
+	if err := config.Migrate(db); err != nil {
+		log.Fatalf("Gagal migrasi database: %v", err)
+	}
+
 	// Inisialisasi WebSocket Hub & jalankan goroutine
 	hub := ws.NewHub()
 	go hub.Run()
