@@ -1,0 +1,76 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { Users, Cog, Fuel } from "lucide-react";
+import type { Vehicle } from "@/lib/data";
+
+export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
+  const router = useRouter();
+
+  const goToBookingDetail = () => {
+    router.push(`/admin/bookings/${vehicle.id}`);
+  };
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={goToBookingDetail}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") goToBookingDetail();
+      }}
+      className="cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+    >
+      <div className="relative mb-4 h-44 w-full overflow-hidden rounded-xl bg-slate-900">
+        <Image
+          src={vehicle.image}
+          alt={`${vehicle.name} ${vehicle.variant}`}
+          fill
+          sizes="(min-width: 768px) 320px, 100vw"
+          className="object-cover"
+        />
+        <span className="absolute right-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold tracking-wide text-slate-700">
+          {vehicle.tag}
+        </span>
+      </div>
+
+      <div className="flex items-start justify-between">
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">{vehicle.name}</h3>
+          <p className="text-sm text-slate-400">{vehicle.variant}</p>
+        </div>
+        <p className="whitespace-nowrap text-lg font-bold text-slate-900">
+          ${vehicle.pricePerDay}
+          <span className="text-sm font-medium text-slate-400">/day</span>
+        </p>
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500">
+        <span className="flex items-center gap-1.5">
+          <Users className="h-4 w-4" />
+          {vehicle.seats} Seats
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Cog className="h-4 w-4" />
+          {vehicle.transmission}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Fuel className="h-4 w-4" />
+          {vehicle.fuel}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          goToBookingDetail();
+        }}
+        className="mt-5 w-full rounded-xl bg-gradient-to-r from-parago-peach to-parago-peachDark py-3.5 text-[15px] font-bold text-slate-900 transition hover:brightness-95 active:scale-[0.99]"
+      >
+        Book Now
+      </button>
+    </div>
+  );
+}
