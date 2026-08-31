@@ -373,7 +373,7 @@ export default function RegisterPage() {
               >
                 {isLoading ? "Processing..." : "Create Account"}
                 <ArrowRight className="h-4 w-4" />
-              </button>
+              </button> 
 
               {/* Divider */}
               <div className="flex items-center gap-4 pt-2">

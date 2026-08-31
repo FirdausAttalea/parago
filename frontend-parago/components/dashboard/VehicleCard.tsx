@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Users, Cog, Fuel } from "lucide-react";
 import type { Vehicle } from "@/lib/data";
 
@@ -24,7 +25,9 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
           <p className="text-sm text-slate-400">{vehicle.variant}</p>
         </div>
         <p className="whitespace-nowrap text-lg font-bold text-slate-900">
-          {vehicle.pricePerDay}
+          {typeof vehicle.pricePerDay === "number"
+            ? `Rp ${vehicle.pricePerDay.toLocaleString("id-ID")}`
+            : vehicle.pricePerDay}
           <span className="text-sm font-medium text-slate-400">/day</span>
         </p>
       </div>
@@ -44,12 +47,12 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
         </span>
       </div>
 
-      <button
-        type="button"
-        className="mt-5 w-full rounded-xl bg-gradient-to-r from-parago-peach to-parago-peachDark py-3.5 text-[15px] font-bold text-slate-900 transition hover:brightness-95 active:scale-[0.99]"
+      <Link
+        href="/dashboard/book/new"
+        className="mt-5 block w-full rounded-xl bg-gradient-to-r from-parago-peach to-parago-peachDark py-3.5 text-center text-[15px] font-bold text-slate-900 transition hover:brightness-95 active:scale-[0.99]"
       >
         Book Now
-      </button>
+      </Link>
     </div>
   );
 }

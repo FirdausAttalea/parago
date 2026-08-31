@@ -30,13 +30,13 @@ export default function DashboardPage() {
             <Filter className="h-4 w-4" />
             Filter Search
           </button>
-          <button
-            type="button"
+          <Link
+            href="/dashboard/book/new"
             className="flex items-center gap-2 rounded-xl bg-parago-navy px-5 py-3 text-sm font-semibold text-white transition hover:bg-parago-navy/90"
           >
             <Plus className="h-4 w-4" />
             Quick Booking
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -74,15 +74,15 @@ export default function DashboardPage() {
             <BookingItem key={booking.id} booking={booking} />
           ))}
 
-          <button
-            type="button"
+          <Link
+            href="/dashboard/book/new"
             className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 py-8 text-slate-400 transition hover:border-parago-blue hover:text-parago-blue"
           >
             <Plus className="h-6 w-6" />
             <span className="text-xs font-semibold tracking-wide">
               PLAN NEW TRIP
             </span>
-          </button>
+          </Link>
 
           {/* Stat cards */}
           <div className="grid grid-cols-2 gap-4 pt-2">

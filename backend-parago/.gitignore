@@ -1,3 +1,8 @@
+# Environment variables
 .env
-/tmp/
+.env.*
+!.env.example
+
+# Logs and temp
 *.log
+/tmp/
