@@ -3,7 +3,7 @@ export type Vehicle = {
     name: string;
     variant: string;
     tag: string;
-    pricePerDay: string;
+    pricePerDay: number;
     seats: number;
     transmission: "Automatic" | "Manual";
     fuel: "Hybrid" | "Petrol" | "Diesel" | "Electric";
@@ -25,7 +25,7 @@ export const vehicles: Vehicle[] = [
         name: "Toyota Innova",
         variant: "Hybrid Zenix 2.0",
         tag: "LUXURY MPV",
-        pricePerDay: "Rp200.000",
+        pricePerDay: 850000,
         seats: 7,
         transmission: "Automatic",
         fuel: "Hybrid",
@@ -36,7 +36,7 @@ export const vehicles: Vehicle[] = [
         name: "Honda Accord",
         variant: "Sport Edition VTEC",
         tag: "EXECUTIVE SEDAN",
-        pricePerDay: "Rp250.000",
+        pricePerDay: 720000,
         seats: 5,
         transmission: "Automatic",
         fuel: "Petrol",
@@ -60,6 +60,63 @@ export const bookings: Booking[] = [
         location: "Corporate HQ",
         status: "PENDING",
         actionLabel: "Modify",
+    },
+];
+
+export type NotificationType =
+    | "approved"
+    | "ready"
+    | "policy"
+    | "maintenance";
+
+export type Notification = {
+    id: string;
+    type: NotificationType;
+    title: string;
+    timestamp: string;
+    description: string;
+    actions: { label: string; variant: "primary" | "muted" }[];
+};
+
+export const notifications: Notification[] = [
+    {
+        id: "n1",
+        type: "approved",
+        title: "Booking Approved",
+        timestamp: "JUST NOW",
+        description:
+            "Booking **#PRG-9920** for Mercedes S-Class has been confirmed by fleet management.",
+        actions: [
+            { label: "VIEW DETAILS", variant: "primary" },
+            { label: "DISMISS", variant: "muted" },
+        ],
+    },
+    {
+        id: "n2",
+        type: "ready",
+        title: "Vehicle Ready",
+        timestamp: "14 MIN AGO",
+        description:
+            "Asset **V-402** (Range Rover Vogue) has cleared inspection and is ready for dispatch at Gate 4.",
+        actions: [{ label: "DISPATCH ASSET", variant: "primary" }],
+    },
+    {
+        id: "n3",
+        type: "policy",
+        title: "Policy Update",
+        timestamp: "2H AGO",
+        description:
+            "The **Inter-State Transit Policy** has been updated for Q3 operations. Please review the new toll guidelines.",
+        actions: [{ label: "READ DOCUMENT", variant: "primary" }],
+    },
+    {
+        id: "n4",
+        type: "maintenance",
+        title: "Maintenance Overdue",
+        timestamp: "5H AGO",
+        description:
+            "BMW 7-Series **(Asset #202)** requires immediate brake service. Booking blocked.",
+        actions: [{ label: "SCHEDULE SERVICE", variant: "primary" }],
     },
 ];
 
