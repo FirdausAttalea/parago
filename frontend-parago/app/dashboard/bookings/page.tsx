@@ -69,8 +69,8 @@ const FILTER_TABS: Array<{ label: string; value: BookingOverviewStatus | null }>
 /* ── Helper: format currency ───────────────────── */
 function formatCurrency(amount: number): string {
   return amount === 0
-    ? "$0.00"
-    : `$${amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+    ? "Rp0"
+    : `Rp${amount.toLocaleString("id-ID")}`;
 }
 
 /* ── Badge component ───────────────────────────── */
@@ -261,11 +261,20 @@ function BookingCard({ booking }: { booking: BookingOverviewItem }) {
 export default function BookingsOverviewPage() {
   const [activeTab, setActiveTab] = useState<BookingOverviewStatus | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+
+  const categories = useMemo(() => {
+    const types = new Set(bookingOverviews.map(b => b.vehicle.type));
+    return ["all", ...Array.from(types)];
+  }, []);
 
   /* ── Derived data ─────────────────────────────── */
   const filtered = useMemo(() => {
     let list = bookingOverviews;
     if (activeTab) list = list.filter((b) => b.status === activeTab);
+    if (categoryFilter !== "all") {
+      list = list.filter((b) => b.vehicle.type === categoryFilter);
+    }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
@@ -276,7 +285,7 @@ export default function BookingsOverviewPage() {
       );
     }
     return list;
-  }, [activeTab, searchQuery]);
+  }, [activeTab, searchQuery, categoryFilter]);
 
   /* ── Stats ─────────────────────────────────────── */
   const totalBookings = bookingOverviews.length;
@@ -344,7 +353,7 @@ export default function BookingsOverviewPage() {
             <DollarSign className="h-5 w-5 text-amber-600" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-slate-400">Total Revenue</p>
+            <p className="text-xs font-semibold text-slate-400">Sisa Saldo</p>
             <p className="text-xl font-extrabold text-parago-navy">
               {formatCurrency(totalRevenue)}
             </p>
@@ -364,13 +373,26 @@ export default function BookingsOverviewPage() {
             className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-700 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-parago-blue focus:ring-2 focus:ring-parago-blue/20"
           />
         </div>
-        <button
-          type="button"
-          className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition hover:bg-slate-50"
-        >
-          <SlidersHorizontal className="h-4 w-4" />
-          More Filters
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm outline-none transition hover:bg-slate-50 focus:border-parago-blue focus:ring-2 focus:ring-parago-blue/20"
+          >
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat === "all" ? "All Categories" : cat}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition hover:bg-slate-50"
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            More Filters
+          </button>
+        </div>
       </div>
 
       {/* ── Filter Tabs ──────────────────────────── */}
