@@ -1,0 +1,12 @@
+.customPopup .leaflet-popup-content-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+.customPopup .leaflet-popup-content {
+  margin: 0 !important;
+}
+.customPopup .leaflet-popup-tip {
+  background: transparent !important;
+}
