@@ -3,10 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Truck, Users, Map } from "lucide-react";
+import { LayoutDashboard, Truck, Users, Map, ClipboardList } from "lucide-react";
 
 const menuItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Bookings", href: "/dashboard/bookings", icon: ClipboardList },
   { label: "Live Tracking", href: "/dashboard/tracking", icon: Map },
   { label: "Kendaraan", href: "/dashboard/vehicle", icon: Truck },
   { label: "Pengemudi", href: "/dashboard/driver", icon: Users },

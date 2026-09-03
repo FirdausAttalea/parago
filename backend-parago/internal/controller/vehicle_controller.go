@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"strconv"
 
 	"parago-backend/internal/models"
 	"parago-backend/internal/repository"
@@ -63,7 +62,7 @@ func (c *VehicleController) Create(ctx *gin.Context) {
 func (c *VehicleController) UpdateLocation(ctx *gin.Context) {
 	id, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		response.BadRequest(ctx, "ID tidak valid")
 		return
 	}
 
@@ -76,7 +75,7 @@ func (c *VehicleController) UpdateLocation(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.Repo.UpdateLocation(uint(id), payload.Latitude, payload.Longitude); err != nil {
+	if err := c.Repo.UpdateLocation(id, payload.Latitude, payload.Longitude); err != nil {
 		response.InternalError(ctx, "Gagal update lokasi")
 		return
 	}

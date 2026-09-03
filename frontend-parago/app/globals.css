@@ -25,3 +25,52 @@ body {
 * {
     box-sizing: border-box;
 }
+
+/* ══════════════════════════════════════════════════
+   LEAFLET CUSTOM POPUP & TOOLTIP DESIGN SYSTEM
+   ══════════════════════════════════════════════════ */
+.leaflet-popup-content-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  line-height: inherit !important;
+}
+
+.leaflet-popup-tip-container {
+  overflow: visible !important;
+  width: 24px !important;
+  height: 12px !important;
+  margin-left: -12px !important;
+}
+
+.leaflet-popup-tip {
+  background: #ffffff !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+  width: 12px !important;
+  height: 12px !important;
+  padding: 1px !important;
+  margin: -6px auto 0 !important;
+}
+
+/* Custom Tooltip Container Reset */
+.leaflet-tooltip.parago-leaflet-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.leaflet-tooltip-top.parago-leaflet-card::before {
+  border-top-color: #ffffff !important;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.08));
+}
+
+.leaflet-tooltip-bottom.parago-leaflet-card::before {
+  border-bottom-color: #ffffff !important;
+  filter: drop-shadow(0 -2px 2px rgba(0, 0, 0, 0.08));
+}
