@@ -666,6 +666,13 @@ export default function BookingsOverviewPage() {
           <span className="flex h-5 w-5 items-center justify-center rounded-md bg-white/10 text-xs">+</span>
           New Booking
         </Link>
+        <Link
+          href="/dashboard/tracking/live-tracking"
+          className="ml-3 flex items-center gap-2 rounded-xl bg-parago-blue px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-parago-blue/90 hover:shadow-lg"
+        >
+          <MapPin className="h-5 w-5" />
+          Live Tracking
+        </Link>
       </div>
 
       {/* ── Stats Summary ────────────────────────── */}
