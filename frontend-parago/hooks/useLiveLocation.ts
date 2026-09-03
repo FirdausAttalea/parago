@@ -10,6 +10,7 @@ export interface LiveLocation {
   error: string | null;
   trail: LatLng[]; // past positions for polyline
   simulate: boolean;
+  setSimulate: (v: boolean) => void;
 }
 
 /**
