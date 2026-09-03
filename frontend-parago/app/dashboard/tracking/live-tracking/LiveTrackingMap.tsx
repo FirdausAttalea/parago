@@ -226,6 +226,9 @@ export default function LiveTrackingMap() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
           crossOrigin="anonymous"
+          keepBuffer={8}
+          updateWhenIdle={false}
+          maxZoom={19}
         />
 
         {position && (

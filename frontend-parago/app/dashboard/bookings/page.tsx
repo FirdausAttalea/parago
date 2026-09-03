@@ -659,20 +659,22 @@ export default function BookingsOverviewPage() {
           </p>
         </div>
 
-        <Link
-          href="/dashboard/book/new"
-          className="flex shrink-0 items-center gap-2 rounded-xl bg-parago-navy px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-parago-navy/90 hover:shadow-lg"
-        >
-          <span className="flex h-5 w-5 items-center justify-center rounded-md bg-white/10 text-xs">+</span>
-          New Booking
-        </Link>
-        <Link
-          href="/dashboard/tracking/live-tracking"
-          className="ml-3 flex items-center gap-2 rounded-xl bg-parago-blue px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-parago-blue/90 hover:shadow-lg"
-        >
-          <MapPin className="h-5 w-5" />
-          Live Tracking
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          <Link
+            href="/dashboard/book/new"
+            className="flex items-center gap-2 rounded-xl bg-parago-navy px-4 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-parago-navy/90 hover:shadow-lg"
+          >
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-white/10 text-xs">+</span>
+            New Booking
+          </Link>
+          <Link
+            href="/dashboard/tracking/live-tracking"
+            className="flex items-center gap-2 rounded-xl bg-parago-blue px-4 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-parago-blue/90 hover:shadow-lg"
+          >
+            <MapPin className="h-4 w-4" />
+            Live Tracking
+          </Link>
+        </div>
       </div>
 
       {/* ── Stats Summary ────────────────────────── */}
