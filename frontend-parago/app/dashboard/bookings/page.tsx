@@ -586,6 +586,17 @@ function BookingCard({
    MAIN PAGE COMPONENT
    ══════════════════════════════════════════════════ */
 export default function BookingsOverviewPage() {
+  // State hooks
+  const [bookingList, setBookingList] = useState<BookingOverviewItem[]>(initialBookingOverviews);
+  const [activeTab, setActiveTab] = useState<BookingOverviewStatus | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [cancelTarget, setCancelTarget] = useState<BookingOverviewItem | null>(null);
+  const [invoiceTarget, setInvoiceTarget] = useState<BookingOverviewItem | null>(null);
+
+  // Handlers for opening modals
+  const onOpenCancel = (booking: BookingOverviewItem) => setCancelTarget(booking);
+  const onOpenInvoice = (booking: BookingOverviewItem) => setInvoiceTarget(booking);
 
 
   const categories = useMemo(() => {
@@ -764,6 +775,10 @@ export default function BookingsOverviewPage() {
       </nav>
 
       {/* ── Booking Cards Grid ───────────────────── */}
+      {filtered.length === 0 ? (
+        <div className="mt-8 flex flex-col items-center justify-center py-16 text-center">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100">
+            <Search className="h-8 w-8 text-slate-400" />
           </div>
           <h3 className="mt-4 text-lg font-bold text-slate-700">
             No bookings found
@@ -773,6 +788,17 @@ export default function BookingsOverviewPage() {
               ? `No results matching "${searchQuery}". Try a different keyword.`
               : "There are no bookings matching the selected filter."}
           </p>
+        </div>
+      ) : (
+        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filtered.map((booking) => (
+            <BookingCard
+              key={booking.id}
+              booking={booking}
+              onOpenCancel={onOpenCancel}
+              onOpenInvoice={onOpenInvoice}
+            />
+          ))}
         </div>
       )}
 
@@ -791,21 +817,7 @@ export default function BookingsOverviewPage() {
       />
 
       {/* ── Fade-in animation ────────────────────── */}
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-      `}</style>
+      <style jsx global>{`\n        @keyframes fadeIn {\n          from {\n            opacity: 0;\n            transform: translateY(8px);\n          }\n          to {\n            opacity: 1;\n            transform: translateY(0);\n          }\n        }\n        .animate-fadeIn {\n          animation: fadeIn 0.3s ease-out;\n        }\n      `}</style>
     </div>
   );
 }
