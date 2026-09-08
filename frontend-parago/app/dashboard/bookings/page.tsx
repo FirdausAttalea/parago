@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -32,6 +32,8 @@ import {
   type BookingOverviewItem,
   type BookingOverviewStatus,
 } from "@/lib/bookingData";
+import useSWR from "swr";
+
 
 /* ══════════════════════════════════════════════════
    1. SISTEM PEWARNAAN STATUS CARD (Color-Coding)
@@ -584,14 +586,7 @@ function BookingCard({
    MAIN PAGE COMPONENT
    ══════════════════════════════════════════════════ */
 export default function BookingsOverviewPage() {
-  const [bookingList, setBookingList] = useState<BookingOverviewItem[]>(initialBookingOverviews);
-  const [activeTab, setActiveTab] = useState<BookingOverviewStatus | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
 
-  // State untuk Modals
-  const [cancelTarget, setCancelTarget] = useState<BookingOverviewItem | null>(null);
-  const [invoiceTarget, setInvoiceTarget] = useState<BookingOverviewItem | null>(null);
 
   const categories = useMemo(() => {
     const types = new Set(bookingList.map((b) => b.vehicle.type));
@@ -659,20 +654,22 @@ export default function BookingsOverviewPage() {
           </p>
         </div>
 
-        <Link
-          href="/dashboard/book/new"
-          className="flex shrink-0 items-center gap-2 rounded-xl bg-parago-navy px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-parago-navy/90 hover:shadow-lg"
-        >
-          <span className="flex h-5 w-5 items-center justify-center rounded-md bg-white/10 text-xs">+</span>
-          New Booking
-        </Link>
-        <Link
-          href="/dashboard/tracking/live-tracking"
-          className="ml-3 flex items-center gap-2 rounded-xl bg-parago-blue px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-parago-blue/90 hover:shadow-lg"
-        >
-          <MapPin className="h-5 w-5" />
-          Live Tracking
-        </Link>
+        <div className="flex shrink-0 items-center gap-3">
+          <Link
+            href="/dashboard/book/new"
+            className="flex items-center gap-2 rounded-xl bg-parago-navy px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-parago-navy/90 hover:shadow-lg"
+          >
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-white/10 text-xs">+</span>
+            New Booking
+          </Link>
+          <Link
+            href="/dashboard/tracking/live-tracking"
+            className="flex items-center gap-2 rounded-xl bg-parago-blue px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-parago-blue/90 hover:shadow-lg"
+          >
+            <MapPin className="h-5 w-5" />
+            Live Tracking
+          </Link>
+        </div>
       </div>
 
       {/* ── Stats Summary ────────────────────────── */}
@@ -767,22 +764,6 @@ export default function BookingsOverviewPage() {
       </nav>
 
       {/* ── Booking Cards Grid ───────────────────── */}
-      <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {filtered.map((booking) => (
-          <BookingCard
-            key={booking.id}
-            booking={booking}
-            onOpenCancel={(target) => setCancelTarget(target)}
-            onOpenInvoice={(target) => setInvoiceTarget(target)}
-          />
-        ))}
-      </div>
-
-      {/* ── Empty State ──────────────────────────── */}
-      {filtered.length === 0 && (
-        <div className="mt-10 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 py-16 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
-            <Search className="h-6 w-6 text-slate-400" />
           </div>
           <h3 className="mt-4 text-lg font-bold text-slate-700">
             No bookings found

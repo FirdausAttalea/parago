@@ -49,7 +49,7 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
 
       <Link
         href="/dashboard/book/new"
-        className="mt-5 block w-full rounded-xl bg-gradient-to-r from-parago-peach to-parago-peachDark py-3.5 text-center text-[15px] font-bold text-slate-900 transition hover:brightness-95 active:scale-[0.99]"
+        className="mt-5 block w-full rounded-xl bg-parago-blue py-3.5 text-center text-[15px] font-bold text-white transition hover:bg-parago-blue/90 active:scale-[0.99]"
       >
         Book Now
       </Link>
