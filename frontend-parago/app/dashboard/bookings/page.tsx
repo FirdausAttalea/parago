@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -32,6 +32,8 @@ import {
   type BookingOverviewItem,
   type BookingOverviewStatus,
 } from "@/lib/bookingData";
+import useSWR from "swr";
+
 
 /* ══════════════════════════════════════════════════
    1. SISTEM PEWARNAAN STATUS CARD (Color-Coding)
@@ -584,14 +586,18 @@ function BookingCard({
    MAIN PAGE COMPONENT
    ══════════════════════════════════════════════════ */
 export default function BookingsOverviewPage() {
+  // State hooks
   const [bookingList, setBookingList] = useState<BookingOverviewItem[]>(initialBookingOverviews);
   const [activeTab, setActiveTab] = useState<BookingOverviewStatus | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-
-  // State untuk Modals
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [cancelTarget, setCancelTarget] = useState<BookingOverviewItem | null>(null);
   const [invoiceTarget, setInvoiceTarget] = useState<BookingOverviewItem | null>(null);
+
+  // Handlers for opening modals
+  const onOpenCancel = (booking: BookingOverviewItem) => setCancelTarget(booking);
+  const onOpenInvoice = (booking: BookingOverviewItem) => setInvoiceTarget(booking);
+
 
   const categories = useMemo(() => {
     const types = new Set(bookingList.map((b) => b.vehicle.type));
@@ -659,20 +665,22 @@ export default function BookingsOverviewPage() {
           </p>
         </div>
 
-        <Link
-          href="/dashboard/book/new"
-          className="flex shrink-0 items-center gap-2 rounded-xl bg-parago-navy px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-parago-navy/90 hover:shadow-lg"
-        >
-          <span className="flex h-5 w-5 items-center justify-center rounded-md bg-white/10 text-xs">+</span>
-          New Booking
-        </Link>
-        <Link
-          href="/dashboard/tracking/live-tracking"
-          className="ml-3 flex items-center gap-2 rounded-xl bg-parago-blue px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-parago-blue/90 hover:shadow-lg"
-        >
-          <MapPin className="h-5 w-5" />
-          Live Tracking
-        </Link>
+        <div className="flex shrink-0 items-center gap-3">
+          <Link
+            href="/dashboard/book/new"
+            className="flex items-center gap-2 rounded-xl bg-parago-navy px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-parago-navy/90 hover:shadow-lg"
+          >
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-white/10 text-xs">+</span>
+            New Booking
+          </Link>
+          <Link
+            href="/dashboard/tracking/live-tracking"
+            className="flex items-center gap-2 rounded-xl bg-parago-blue px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-parago-blue/90 hover:shadow-lg"
+          >
+            <MapPin className="h-5 w-5" />
+            Live Tracking
+          </Link>
+        </div>
       </div>
 
       {/* ── Stats Summary ────────────────────────── */}
@@ -767,22 +775,10 @@ export default function BookingsOverviewPage() {
       </nav>
 
       {/* ── Booking Cards Grid ───────────────────── */}
-      <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {filtered.map((booking) => (
-          <BookingCard
-            key={booking.id}
-            booking={booking}
-            onOpenCancel={(target) => setCancelTarget(target)}
-            onOpenInvoice={(target) => setInvoiceTarget(target)}
-          />
-        ))}
-      </div>
-
-      {/* ── Empty State ──────────────────────────── */}
-      {filtered.length === 0 && (
-        <div className="mt-10 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 py-16 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
-            <Search className="h-6 w-6 text-slate-400" />
+      {filtered.length === 0 ? (
+        <div className="mt-8 flex flex-col items-center justify-center py-16 text-center">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100">
+            <Search className="h-8 w-8 text-slate-400" />
           </div>
           <h3 className="mt-4 text-lg font-bold text-slate-700">
             No bookings found
@@ -792,6 +788,17 @@ export default function BookingsOverviewPage() {
               ? `No results matching "${searchQuery}". Try a different keyword.`
               : "There are no bookings matching the selected filter."}
           </p>
+        </div>
+      ) : (
+        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filtered.map((booking) => (
+            <BookingCard
+              key={booking.id}
+              booking={booking}
+              onOpenCancel={onOpenCancel}
+              onOpenInvoice={onOpenInvoice}
+            />
+          ))}
         </div>
       )}
 
@@ -810,21 +817,7 @@ export default function BookingsOverviewPage() {
       />
 
       {/* ── Fade-in animation ────────────────────── */}
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-      `}</style>
+      <style jsx global>{`\n        @keyframes fadeIn {\n          from {\n            opacity: 0;\n            transform: translateY(8px);\n          }\n          to {\n            opacity: 1;\n            transform: translateY(0);\n          }\n        }\n        .animate-fadeIn {\n          animation: fadeIn 0.3s ease-out;\n        }\n      `}</style>
     </div>
   );
 }
