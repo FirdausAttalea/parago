@@ -1,20 +1,36 @@
-import { Marker, Popup } from "react-leaflet";
+"use client";
+
+import { Marker, Popup } from "react-map-gl/mapbox";
 import { Vehicle } from "@/types/vehicle";
 import { Car, Gauge, MapPin, User, ArrowUpRight } from "lucide-react";
-import L from "leaflet";
+import Image from "next/image";
 import vehicleIconSvg from "@/public/icons/vehicle.png";
 
-// Custom Rotated Vehicle Marker Icon
-const vehicleIcon = L.icon({
-  iconUrl: vehicleIconSvg.src,
-  iconSize: [44, 22],
-  iconAnchor: [22, 11],
-  popupAnchor: [0, -14],
-});
+interface VehicleMarkerProps {
+  vehicle: Vehicle;
+  isPopupOpen: boolean;
+  onMarkerClick: (id: number | string) => void;
+  onPopupClose: () => void;
+}
 
-export function VehicleMarker({ vehicle }: { vehicle: Vehicle }) {
+export function VehicleMarker({
+  vehicle,
+  isPopupOpen,
+  onMarkerClick,
+  onPopupClose,
+}: VehicleMarkerProps) {
   const isMoving = vehicle.status === "active";
   const isMaintenance = vehicle.status === "maintenance";
+
+  const modelName =
+    typeof vehicle.model === "object" && vehicle.model !== null
+      ? vehicle.model.name || "Unknown Model"
+      : vehicle.model || "";
+  const brandName =
+    vehicle.brand ||
+    (typeof vehicle.model === "object" && vehicle.model?.brand?.name) ||
+    "";
+  const displayName = [brandName, modelName].filter(Boolean).join(" ") || vehicle.plate_number;
 
   // Design system status color tokens (identical to Parago Fleet Booking Overview)
   const statusConfig = isMoving
@@ -44,96 +60,137 @@ export function VehicleMarker({ vehicle }: { vehicle: Vehicle }) {
         stripeClass: "bg-slate-300",
       };
 
+  if (typeof vehicle.latitude !== "number" || typeof vehicle.longitude !== "number") {
+    return null;
+  }
+
   return (
-    <Marker position={[vehicle.latitude, vehicle.longitude]} icon={vehicleIcon}>
-      <Popup className="parago-custom-popup" closeButton={false} offset={[0, -4]}>
-        <div className="w-72 overflow-hidden rounded-2xl bg-white/95 backdrop-blur-md shadow-2xl ring-1 ring-slate-900/10 font-sans transition-all duration-200">
-          {/* Top Status Stripe */}
-          <div className={`h-1.5 w-full ${statusConfig.stripeClass}`} />
+    <>
+      <Marker
+        longitude={vehicle.longitude}
+        latitude={vehicle.latitude}
+        anchor="center"
+        onClick={() => onMarkerClick(vehicle.id)}
+      >
+        {/* Custom vehicle icon with status ring */}
+        <div className="relative cursor-pointer group">
+          {/* Pulsing ring for active vehicles */}
+          {isMoving && (
+            <span className="absolute inset-0 -m-1 rounded-full bg-emerald-400/30 animate-ping" />
+          )}
+          <Image
+            src={vehicleIconSvg}
+            alt={displayName}
+            width={44}
+            height={22}
+            className="drop-shadow-lg group-hover:scale-110 transition-transform duration-150"
+          />
+        </div>
+      </Marker>
 
-          <div className="p-4">
-            {/* Header: Vehicle Name & Status Badge */}
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 text-slate-400 mb-0.5">
-                  <Car className="h-3.5 w-3.5 text-parago-blue" />
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                    Fleet Unit
-                  </span>
+      {isPopupOpen && (
+        <Popup
+          longitude={vehicle.longitude}
+          latitude={vehicle.latitude}
+          anchor="bottom"
+          offset={[0, -14]}
+          closeButton={false}
+          onClose={onPopupClose}
+          className="parago-mapbox-popup"
+        >
+          <div className="w-72 overflow-hidden rounded-2xl bg-white/95 backdrop-blur-md shadow-2xl ring-1 ring-slate-900/10 font-sans">
+            {/* Top Status Stripe */}
+            <div className={`h-1.5 w-full ${statusConfig.stripeClass}`} />
+
+            <div className="p-4">
+              {/* Header: Vehicle Name & Status Badge */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 text-slate-400 mb-0.5">
+                    <Car className="h-3.5 w-3.5 text-parago-blue" />
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                      Fleet Unit
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-bold text-slate-900 tracking-tight truncate">
+                    {displayName}
+                  </h4>
                 </div>
-                <h4 className="text-sm font-bold text-slate-900 tracking-tight truncate">
-                  {vehicle.brand} {vehicle.model}
-                </h4>
+
+                {/* Status Badge Pill */}
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ${statusConfig.badgeBg} ${statusConfig.badgeText} ${statusConfig.badgeRing} shrink-0`}
+                >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${statusConfig.dotColor} ${isMoving ? "animate-pulse" : ""}`}
+                  />
+                  {statusConfig.label}
+                </span>
               </div>
 
-              {/* Status Badge Pill */}
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ${statusConfig.badgeBg} ${statusConfig.badgeText} ${statusConfig.badgeRing} shrink-0`}
-              >
-                <span className={`h-1.5 w-1.5 rounded-full ${statusConfig.dotColor} ${isMoving ? "animate-pulse" : ""}`} />
-                {statusConfig.label}
-              </span>
-            </div>
+              {/* License Plate & Driver Bar */}
+              <div className="mt-3 flex items-center justify-between rounded-xl bg-slate-50 p-2.5 ring-1 ring-slate-200/60">
+                <div className="flex items-center gap-2">
+                  <div className="rounded-lg bg-slate-900 px-2.5 py-1 font-mono text-xs font-black tracking-wider text-white shadow-inner">
+                    {vehicle.plate_number}
+                  </div>
+                </div>
 
-            {/* License Plate & Driver Bar */}
-            <div className="mt-3 flex items-center justify-between rounded-xl bg-slate-50 p-2.5 ring-1 ring-slate-200/60">
-              <div className="flex items-center gap-2">
-                <div className="rounded-lg bg-slate-900 px-2.5 py-1 font-mono text-xs font-black tracking-wider text-white shadow-inner">
-                  {vehicle.plate_number}
+                {/* Driver info */}
+                <div className="flex items-center gap-1.5 text-right">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 text-slate-600 ring-1 ring-white">
+                    <User className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[10px] text-slate-400 font-medium leading-none">Driver</p>
+                    <p className="text-xs font-semibold text-slate-700 leading-tight">
+                      {vehicle.driver?.name || "Unassigned"}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Driver info */}
-              <div className="flex items-center gap-1.5 text-right">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 text-slate-600 ring-1 ring-white">
-                  <User className="h-3.5 w-3.5" />
+              {/* Telemetry Grid: Speed & Coordinates */}
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded-xl border border-slate-100 bg-white/70 p-2 shadow-xs">
+                  <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400">
+                    <Gauge className="h-3 w-3 text-parago-blue" />
+                    <span>Real-time Speed</span>
+                  </div>
+                  <p className="mt-0.5 text-xs font-bold text-slate-800">
+                    {isMoving ? "42 km/h" : "0 km/h"}
+                  </p>
                 </div>
-                <div className="text-left">
-                  <p className="text-[10px] text-slate-400 font-medium leading-none">Driver</p>
-                  <p className="text-xs font-semibold text-slate-700 leading-tight">
-                    {vehicle.driver?.name || "Unassigned"}
+
+                <div className="rounded-xl border border-slate-100 bg-white/70 p-2 shadow-xs">
+                  <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400">
+                    <MapPin className="h-3 w-3 text-rose-500" />
+                    <span>Coordinates</span>
+                  </div>
+                  <p className="mt-0.5 text-[11px] font-mono font-medium text-slate-600 truncate">
+                    {typeof vehicle.latitude === "number" ? vehicle.latitude.toFixed(4) : "-"},{" "}
+                    {typeof vehicle.longitude === "number" ? vehicle.longitude.toFixed(4) : "-"}
                   </p>
                 </div>
               </div>
-            </div>
 
-            {/* Telemetry Grid: Speed & Coordinates */}
-            <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-              <div className="rounded-xl border border-slate-100 bg-white/70 p-2 shadow-xs">
-                <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400">
-                  <Gauge className="h-3 w-3 text-parago-blue" />
-                  <span>Real-time Speed</span>
-                </div>
-                <p className="mt-0.5 text-xs font-bold text-slate-800">
-                  {isMoving ? "42 km/h" : "0 km/h"}
-                </p>
+              {/* Quick Action Footer */}
+              <div className="mt-3.5 flex items-center justify-between border-t border-slate-100 pt-2.5 text-xs">
+                <span className="text-[11px] text-slate-400">
+                  ID: #{String(vehicle.id).slice(0, 8)}
+                </span>
+                <a
+                  href="/dashboard/tracking/live-tracking"
+                  className="inline-flex items-center gap-1 font-semibold text-parago-blue hover:text-blue-700 transition-colors"
+                >
+                  <span>Live Track</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                </a>
               </div>
-
-              <div className="rounded-xl border border-slate-100 bg-white/70 p-2 shadow-xs">
-                <div className="flex items-center gap-1 text-[10px] font-medium text-slate-400">
-                  <MapPin className="h-3 w-3 text-rose-500" />
-                  <span>Coordinates</span>
-                </div>
-                <p className="mt-0.5 text-[11px] font-mono font-medium text-slate-600 truncate">
-                  {vehicle.latitude.toFixed(4)}, {vehicle.longitude.toFixed(4)}
-                </p>
-              </div>
-            </div>
-
-            {/* Quick Action Footer */}
-            <div className="mt-3.5 flex items-center justify-between border-t border-slate-100 pt-2.5 text-xs">
-              <span className="text-[11px] text-slate-400">ID: #{vehicle.id}</span>
-              <a
-                href="/dashboard/tracking/live-tracking"
-                className="inline-flex items-center gap-1 font-semibold text-parago-blue hover:text-blue-700 transition-colors"
-              >
-                <span>Live Track</span>
-                <ArrowUpRight className="h-3.5 w-3.5" />
-              </a>
             </div>
           </div>
-        </div>
-      </Popup>
-    </Marker>
+        </Popup>
+      )}
+    </>
   );
 }

@@ -1,12 +1,28 @@
-.customPopup .leaflet-popup-content-wrapper {
-  background: transparent !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
+/* Mapbox GL Popup — Custom marker styles for Parago Fleet */
+
+/* Wrapper around the vehicle PNG icon */
+.vehicleMarkerWrapper {
+  position: relative;
+  cursor: pointer;
 }
-.customPopup .leaflet-popup-content {
-  margin: 0 !important;
+
+.vehicleMarkerWrapper:hover img {
+  transform: scale(1.1);
+  transition: transform 0.15s ease;
 }
-.customPopup .leaflet-popup-tip {
-  background: transparent !important;
+
+/* Pulsing ring overlay for active vehicles */
+.activePulseRing {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: rgba(52, 211, 153, 0.25);
+  animation: ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
 }
