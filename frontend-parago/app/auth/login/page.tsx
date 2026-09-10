@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus, CheckCircle2 } from "lucide-react";
+import { useState, Suspense, useEffect } from "react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus, CheckCircle2, AlertTriangle, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { api } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 
 const loginSchema = z.object({
   email: z
@@ -26,10 +27,22 @@ function LoginFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isRegistered = searchParams.get("registered") === "true";
+  const { login } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [serverError, setServerError] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Auto-close popup after 3 seconds
+  useEffect(() => {
+    if (showPopup) {
+      const timer = setTimeout(() => {
+        setShowPopup(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showPopup]);
 
   const {
     register,
@@ -37,17 +50,20 @@ function LoginFormContent() {
     formState: { errors, isValid, touchedFields },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    mode: "onChange", // REAL-TIME VALIDATION saat ngetik & blur
+    mode: "onChange",
   });
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    setServerError("");
-    // Bypass authentication check (sementara tanpa database)
-    localStorage.setItem("token", "bypass-mock-session-token");
-    localStorage.setItem("user_email", data.email);
-    router.push("/dashboard");
+    const result = await login(data.email, data.password);
     setIsLoading(false);
+
+    if (result.success) {
+      router.push("/dashboard");
+    } else {
+      setPopupMessage(result.message || "Login failed. Please check your credentials.");
+      setShowPopup(true);
+    }
   };
 
   return (
@@ -143,9 +159,20 @@ function LoginFormContent() {
               </div>
             )}
 
-            {serverError && (
-              <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm font-medium text-red-600 border border-red-200">
-                {serverError}
+            {/* Popup Banner for Auth Errors */}
+            {showPopup && (
+              <div className="animate-slideDown mt-4 flex items-start gap-3 rounded-lg bg-red-50 p-4 text-sm font-medium border border-red-200 shadow-md">
+                <AlertTriangle className="h-5 w-5 shrink-0 text-red-600 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-red-700">{popupMessage}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPopup(false)}
+                  className="shrink-0 text-red-400 hover:text-red-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
             )}
 
