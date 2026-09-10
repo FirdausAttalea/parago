@@ -1,17 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import { Filter, Plus, BadgeCheck, Gauge, ArrowRight } from "lucide-react";
 import VehicleCard from "@/components/dashboard/VehicleCard";
 import BookingItem from "@/components/dashboard/BookingItem";
 import { vehicles, bookings } from "@/lib/data";
 
-const TOTAL_AVAILABLE = 14;
+const TOTAL_AVAILABLE = 0;
 const FLEET_GRADE = "Executive";
-const TOTAL_MILES = 12482;
+const TOTAL_MILES = 0;
 
 export default function DashboardPage() {
+
   return (
     <div>
-      {/* Header */}
+      {/* Header with Profile */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-xs font-semibold tracking-widest2 text-slate-400">
@@ -23,6 +26,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
+          
           <button
             type="button"
             className="flex items-center gap-2 rounded-xl bg-blue-100 px-5 py-3 text-sm font-semibold text-parago-blue transition hover:bg-blue-200"
@@ -37,6 +41,7 @@ export default function DashboardPage() {
             <Plus className="h-4 w-4" />
             Quick Booking
           </Link>
+          
         </div>
       </div>
 

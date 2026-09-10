@@ -2,15 +2,21 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Search, Bell, Settings, ChevronRight } from "lucide-react";
+import { Search, Bell, Settings, ChevronRight, LogOut, User } from "lucide-react";
 import { currentUser, notifications } from "@/lib/data";
 import NotificationCenter from "@/components/notifications/NotificationCenter";
 import { useBreadcrumb } from "@/components/layout/BreadcrumbContext";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth";
 
 export default function Topbar() {
   const [notifOpen, setNotifOpen] = useState(false);
   const unreadCount = notifications.length;
   const { crumbs } = useBreadcrumb();
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  // const userName = user?.name || "User";
+  // const userRole = user?.role || "Employee";
 
   return (
     <header className="flex items-center gap-4 border-b border-slate-200 bg-white px-6 py-4 md:px-10">
@@ -66,16 +72,33 @@ export default function Topbar() {
       </button>
 
       <div className="h-6 w-px bg-slate-200" />
-
-      <div className="relative h-10 w-10 overflow-hidden rounded-xl bg-slate-900">
-        <Image
-          src={currentUser.avatar}
-          alt={currentUser.name}
-          fill
-          sizes="40px"
-          className="object-cover"
-        />
+      <div className="hidden md:flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-slate-50 cursor-pointer transition">
+        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-slate-900">
+          <Image
+            src={currentUser.avatar}
+            alt={currentUser.name}
+            fill
+            sizes="36px"
+            className="object-cover"
+          />
+        </div>
+        <div className="flex flex-col">
+          <p className="text-[10px] font-medium text-slate-500">Welcome,</p>
+          <p className="text-xs font-semibold text-slate-900 uppercase tracking-wide">{currentUser.role}</p>
+        </div>
       </div>
+      
+      <button
+            type="button"
+            onClick={() => {
+              logout();
+              router.push("/auth/login");
+            }}
+            className="flex items-center gap-2 rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+            title="Logout"
+          >
+            <LogOut className="h-4 w-4" />
+      </button>
     </header>
   );
 }

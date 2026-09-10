@@ -70,10 +70,29 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     setServerError("");
-    localStorage.setItem("token", "bypass-mock-session-token");
-    localStorage.setItem("user_email", data.email);
-    router.push("/dashboard");
-    setIsLoading(false);
+
+    try {
+      const response = await api.post("/auth/register", {
+        email: data.email,
+        phone_number: data.phoneNumber,
+        password: data.password,
+      });
+
+      if (response.data.success) {
+        // Registration successful, redirect to login with message
+        router.push("/auth/login?registered=true");
+      } else {
+        setServerError(response.data.message || "Registration failed");
+      }
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        setServerError(error.response.data.message);
+      } else {
+        setServerError("Network error. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

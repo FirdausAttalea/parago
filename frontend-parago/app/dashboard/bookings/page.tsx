@@ -1,5 +1,7 @@
 "use client";
 
+"use client";
+
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -26,13 +28,15 @@ import {
   Printer,
   CheckCircle2,
   Car,
+  LogOut,
 } from "lucide-react";
 import {
   bookingOverviews as initialBookingOverviews,
   type BookingOverviewItem,
   type BookingOverviewStatus,
 } from "@/lib/bookingData";
-import useSWR from "swr";
+import { useAuth } from "@/lib/auth";
+import { api } from "@/lib/api";
 
 
 /* ══════════════════════════════════════════════════
@@ -594,9 +598,20 @@ export default function BookingsOverviewPage() {
   const [cancelTarget, setCancelTarget] = useState<BookingOverviewItem | null>(null);
   const [invoiceTarget, setInvoiceTarget] = useState<BookingOverviewItem | null>(null);
 
+  // Auth context
+  const { user } = useAuth();
+  const router = useRouter();
+
   // Handlers for opening modals
   const onOpenCancel = (booking: BookingOverviewItem) => setCancelTarget(booking);
   const onOpenInvoice = (booking: BookingOverviewItem) => setInvoiceTarget(booking);
+
+  // Logout handler
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    router.push("/auth/login");
+  };
 
 
   const categories = useMemo(() => {
