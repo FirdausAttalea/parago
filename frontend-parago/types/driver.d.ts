@@ -1,9 +1,9 @@
 export interface Driver {
-    id: number;
+    id: string;
     name: string;
     license_no: string;
-    phone_number: string;
-    is_available: boolean;
+    phone: string;
+    status: "available" | "on_duty" | "resigned";
     created_at: string;
     updated_at: string;
 }

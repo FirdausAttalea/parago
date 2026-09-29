@@ -6,8 +6,16 @@ export function useVehicles() {
     return useQuery({
         queryKey: ["vehicles"],
         queryFn: async () => {
-            const { data } = await api.get<Vehicle[]>("/vehicles");
-            return data;
+            const res = await api.get("/vehicles");
+            // Backend returns response envelope: { success: true, data: [...] }
+            const payload = res.data;
+            if (payload && Array.isArray(payload.data)) {
+                return payload.data as Vehicle[];
+            }
+            if (Array.isArray(payload)) {
+                return payload as Vehicle[];
+            }
+            return [];
         },
     });
 }

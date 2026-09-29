@@ -84,9 +84,14 @@ export default function RegisterPage() {
       } else {
         setServerError(response.data.message || "Registration failed");
       }
-    } catch (error: any) {
-      if (error.response?.data?.message) {
-        setServerError(error.response.data.message);
+    } catch (error: unknown) {
+      if (error instanceof Error && "response" in error) {
+        const err = error as { response?: { data?: { message?: string } } };
+        if (err.response?.data?.message) {
+          setServerError(err.response.data.message);
+        } else {
+          setServerError("Network error. Please try again.");
+        }
       } else {
         setServerError("Network error. Please try again.");
       }

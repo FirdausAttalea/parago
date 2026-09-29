@@ -120,8 +120,14 @@ export const notifications: Notification[] = [
     },
 ];
 
+// export type CurrentUser[] = {
+//     name: string;
+//     role: string;
+//     avatar: string;
+// }
+
 export const currentUser = {
     name: "Marcus Chen",
-    role: "DIRECTOR",
+    role: "Admin",
     avatar: "/avatars/marcus-chen.jpg",
 };

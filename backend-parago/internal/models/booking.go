@@ -31,9 +31,15 @@ type Booking struct {
 	NeedsDriver    bool      `gorm:"not null;default:false" json:"needs_driver"`
 	StartDatetime  time.Time `gorm:"not null" json:"start_datetime"`
 	EndDatetime    time.Time `gorm:"not null" json:"end_datetime"`
-	Purpose        string    `json:"purpose"`
-	Destination    string    `json:"destination"`
-	PassengerCount int       `json:"passenger_count"`
+	Purpose            string     `json:"purpose"`
+	Destination        string     `json:"destination"`
+	DestinationLat     *float64   `json:"destination_lat,omitempty"`
+	DestinationLng     *float64   `json:"destination_lng,omitempty"`
+	PickupName         *string    `json:"pickup_name,omitempty"`
+	PickupAddress      *string    `json:"pickup_address,omitempty"`
+	PickupLat          *float64   `json:"pickup_lat,omitempty"`
+	PickupLng          *float64   `json:"pickup_lng,omitempty"`
+	PassengerCount     int        `json:"passenger_count"`
 
 	// pending_admin / pending_division / approved / ongoing / completed /
 	// rejected / cancelled — lihat konstanta BookingStatus* di enums.go.

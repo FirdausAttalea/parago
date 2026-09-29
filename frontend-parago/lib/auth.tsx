@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import { api } from "./api";
 
 export interface User {
@@ -26,27 +26,19 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Check for existing session on mount
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window === "undefined") return null;
     const storedUser = localStorage.getItem("user");
-
-    if (storedToken && storedUser) {
-      try {
-        const userData = JSON.parse(storedUser);
-        setUser(userData);
-        setToken(storedToken);
-      } catch {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-      }
+    if (storedUser) {
+      try { return JSON.parse(storedUser); } catch { return null; }
     }
-    setIsLoading(false);
-  }, []);
+    return null;
+  });
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("token");
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const login = async (email: string, password: string) => {
     try {
@@ -65,8 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         return { success: false, message: response.data.message };
       }
-    } catch (error: any) {
-      const message = error.response?.data?.message || "Network error. Please try again.";
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Network error. Please try again.";
       return { success: false, message };
     }
   };
@@ -95,8 +87,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         return { success: false, message: response.data.message };
       }
-    } catch (error: any) {
-      const message = error.response?.data?.message || "Network error. Please try again.";
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Network error. Please try again.";
       return { success: false, message };
     }
   };

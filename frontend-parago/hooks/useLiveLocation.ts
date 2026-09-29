@@ -21,7 +21,10 @@ export function useLiveLocation(): LiveLocation {
   const [position, setPosition] = useState<LatLng | null>(null);
   const [speedKmh, setSpeedKmh] = useState(0);
   const [heading, setHeading] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) return "Geolocation not supported";
+    return null;
+  });
   const [trail, setTrail] = useState<LatLng[]>([]);
   const [simulate, setSimulate] = useState(false);
 
@@ -39,10 +42,7 @@ export function useLiveLocation(): LiveLocation {
   // Real geolocation handling
   useEffect(() => {
     if (simulate) return; // skip real watch when simulating
-    if (!navigator.geolocation) {
-      setError("Geolocation not supported");
-      return;
-    }
+    if (!navigator.geolocation) return;
     const success = (pos: GeolocationPosition) => {
       const { latitude, longitude, speed, heading: geoHeading } = pos.coords;
       const newPos = new LatLng(latitude, longitude);
@@ -104,12 +104,6 @@ export function useLiveLocation(): LiveLocation {
     error,
     trail,
     simulate,
-    // expose a toggle for UI
-    // Note: we cannot return functions directly in the returned object type; use a setter
-    // The caller can use setSimulate via the hook's returned tuple if needed.
-    // For simplicity we attach a method here.
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     setSimulate,
-  } as LiveLocation & { setSimulate: (v: boolean) => void };
+  };
 }

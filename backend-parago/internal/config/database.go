@@ -31,7 +31,7 @@ func buildDSN() string {
 		Scheme:   "postgres",
 		User:     url.UserPassword(GetEnv("DB_USER", "postgres"), os.Getenv("DB_PASSWORD")),
 		Host:     GetEnv("DB_HOST", "localhost") + ":" + GetEnv("DB_PORT", "5432"),
-		Path:     GetEnv("DB_NAME", "parago_db"),
+		Path:     GetEnv("DB_NAME", "parago_backend"),
 		RawQuery: query.Encode(),
 	}
 	return dsn.String()
@@ -43,6 +43,5 @@ func ConnectDB() *gorm.DB {
 		log.Fatalf("Gagal konek ke database: %v", err)
 	}
 
-	log.Println("Berhasil konek ke database")
 	return db
 }

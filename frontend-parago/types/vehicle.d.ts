@@ -1,16 +1,25 @@
 export interface Vehicle {
-    id: number;
+    id: number | string;
     plate_number: string;
-    brand: string;
-    model: string;
-    status: "active" | "inactive" | "maintenance";
-    latitude: number;
-    longitude: number;
-    driver_id?: number;
+    brand?: string;
+    model?: string | {
+        id?: string;
+        name?: string;
+        brand_id?: string;
+        brand?: {
+            name?: string;
+        };
+    };
+    year?: number;
+    color?: string;
+    status: "active" | "inactive" | "maintenance" | "retired" | string;
+    latitude?: number;
+    longitude?: number;
+    driver_id?: number | string;
     driver?: {
-        id: number;
+        id: number | string;
         name: string;
     };
-    created_at: string;
-    updated_at: string;
+    created_at?: string;
+    updated_at?: string;
 }
